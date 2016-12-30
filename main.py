@@ -50,8 +50,23 @@ class App(Gtk.Application):
 
 	def on_quit_activate(self, *args):
 		self.quit()
-		
+
 app = App()
+
+#dictionary for storing current config
+current_config={
+	'manualauto': '', # valid: 'manual', 'auto'
+	'hybrid': '', #valid: 'no', 'intelnvidia', 'intelamd', 'amdnvidia', 'amdamd'
+}
+
+mainstack_special_pages = [ # page indexes where the next button should be locked waiting for user interaction
+	1, # choose auto detect or manual config
+]
+
+special_pages_directions = {
+	-3: -2,
+	2: +2
+}
 
 IMG_PATH = EXEC_FOLDER+'/img/'
 VENDOR_ICONS = {
@@ -69,11 +84,42 @@ back_button = builder.get_object('backButton')
 detected_hw_label = builder.get_object('detectedHwLabel')
 hardware_listbox = builder.get_object('hardwareListbox')
 
+# fill static listboxes
+# manual or auto configuration
+manual_auto_config_listbox = builder.get_object('manualOrAutoChooseListbox')
+moac_labels = [
+	'Detect hardware automatically',
+	'Select hardware manually'
+]
+moac_pics = [
+	IMG_PATH+'search.svg',
+	IMG_PATH+'touch.svg'
+]
+moac_values = [
+	'auto',
+	'manual'
+]
+for i in range(0,2):
+	box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+	label = Gtk.Label()
+	label.set_text(moac_labels[i])
+	icon = Gtk.Image()
+	icon.set_from_file(moac_pics[i])
+	label.set_margin_left(12)
+	label.set_margin_right(12)
+	box.pack_start(icon, False, False, 0)
+	box.pack_start(label, False, False, 0)
+	row = Gtk.ListBoxRow()
+	row.add(box)
+	row.value = moac_values[i]
+	manual_auto_config_listbox.add(row)
+manual_auto_config_listbox.show_all()
+
 class Handler:
 
 	def onDeleteWindow(self, *args):
 		app.quit()
-	
+
 	def _move_stack(self, direction):
 		current_child_index = main_stack_children.index(
 			main_stack.get_visible_child()
@@ -81,7 +127,7 @@ class Handler:
 		main_stack.set_visible_child(
 			main_stack_children[current_child_index+direction]
 		)
-		
+
 		if current_child_index+direction >= len(main_stack_children)-1:
 			next_button.set_sensitive(False)
 			back_button.set_sensitive(True)
@@ -91,16 +137,38 @@ class Handler:
 		else:
 			next_button.set_sensitive(True)
 			back_button.set_sensitive(True)
-			
-	
+		if current_child_index + direction in mainstack_special_pages:
+			next_button.set_sensitive(False)
+
 	def on_nextButton_clicked(self, button):
-		self._move_stack(1)
+		current_child_index = main_stack_children.index(
+			main_stack.get_visible_child()
+		)
+		if current_child_index in special_pages_directions:
+			self._move_stack(special_pages_directions[current_child_index])
+		else:
+			self._move_stack(1)
 
 	def on_backButton_clicked(self, button):
-		self._move_stack(-1)
-		
+		current_child_index = -1 * (main_stack_children.index(
+			main_stack.get_visible_child()
+		))
+		if current_child_index in special_pages_directions.keys():
+			self._move_stack(special_pages_directions[current_child_index])
+		else:
+			self._move_stack(-1)
+
 	def on_detectHwButton_clicked(self, button):
 		hw_l = detectHardware.get_relevant_info()
+		# empty hardware list before filling
+		while True:
+			row = hardware_listbox.get_row_at_index(0)
+			if row:
+				hardware_listbox.remove(row)
+			else:
+				break
+		# fill hardware list
+		hardware_listbox.show()
 		for i in hw_l:
 			box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
 			label = Gtk.Label()
@@ -108,13 +176,22 @@ class Handler:
 			icon = Gtk.Image()
 			icon.set_from_file(VENDOR_ICONS[i[0]])
 			label.set_margin_left(12)
+			label.set_margin_right(12)
 			box.pack_start(icon, False, False, 0)
 			box.pack_start(label, False, False, 0)
 			row = Gtk.ListBoxRow()
 			row.add(box)
 			hardware_listbox.add(row)
-		hardware_listbox.show_all()
+			row.show_all()
 		#detected_hw_label.set_text(hw_str)
+
+	def on_manualOrAutoChooseListbox_row_selected(self, list, row):
+		current_config['manualauto']=row.value
+		if row.value == 'manual':
+			self._move_stack(1)
+		else:
+			self._move_stack(2)
+		# next_button.set_sensitive(True)
 
 
 builder.connect_signals(Handler())
@@ -122,4 +199,3 @@ builder.connect_signals(Handler())
 
 if __name__ == "__main__":
 	app.run(sys.argv)
-
