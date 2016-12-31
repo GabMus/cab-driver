@@ -138,7 +138,7 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                 </child>
                 <child>
                   <object class="GtkButton" id="detectHwButton">
-                    <property name="label" translatable="yes">Auto detect hardware</property>
+                    <property name="label" translatable="yes">Detect hardware</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -155,9 +155,6 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                   <placeholder/>
                 </child>
                 <child>
-                  <placeholder/>
-                </child>
-                <child>
                   <object class="GtkListBox" id="hardwareListbox">
                     <property name="can_focus">False</property>
                     <property name="no_show_all">True</property>
@@ -165,6 +162,23 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                     <property name="valign">center</property>
                     <property name="selection_mode">none</property>
                     <property name="activate_on_single_click">False</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="autoDetectWrongMaybeLabel">
+                    <property name="can_focus">False</property>
+                    <property name="no_show_all">True</property>
+                    <property name="label" translatable="yes">Is this wrong? Go back and choose the manual configuration. Also please consider reporting an issue on the github repository</property>
+                    <property name="justify">center</property>
+                    <property name="wrap">True</property>
+                    <attributes>
+                      <attribute name="style" value="italic"/>
+                    </attributes>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -180,7 +194,34 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
               </packing>
             </child>
             <child>
-              <placeholder/>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="neededPackagesLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">_packages_</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="name">page4</property>
+                <property name="title" translatable="yes">page4</property>
+                <property name="position">4</property>
+              </packing>
             </child>
           </object>
           <packing>
@@ -274,7 +315,7 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
     <property name="version">0.1</property>
     <property name="website">https://github.com/gabmus/cab-driver</property>
     <property name="authors">Gabriele Musco aka GabMus (frontend)</property>
-    <property name="logo">i</property>
+    <property name="logo">icon.svg</property>
     <property name="license_type">gpl-3-0</property>
     <child internal-child="vbox">
       <object class="GtkBox">

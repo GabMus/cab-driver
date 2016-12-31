@@ -5,6 +5,7 @@ from gi.repository import Gtk, Gio, Gdk, GdkPixbuf
 import os
 import sys
 import detectHardware
+import driverMatcher
 
 EXEC_FOLDER = os.path.realpath(os.path.dirname(__file__)) + "/"
 builder = Gtk.Builder()
@@ -61,11 +62,12 @@ current_config={
 
 mainstack_special_pages = [ # page indexes where the next button should be locked waiting for user interaction
 	1, # choose auto detect or manual config
+	3, # autodetect page, need to press autodetect button
 ]
 
 special_pages_directions = {
-	-3: -2,
-	2: +2
+	-3: -2, # coming back from auto config, to choose manual or auto config
+	2: +2 # next from manual config, to packages needed page
 }
 
 IMG_PATH = EXEC_FOLDER+'/img/'
@@ -83,6 +85,8 @@ back_button = builder.get_object('backButton')
 
 detected_hw_label = builder.get_object('detectedHwLabel')
 hardware_listbox = builder.get_object('hardwareListbox')
+
+needed_packages_label = builder.get_object('neededPackagesLabel')
 
 # fill static listboxes
 # manual or auto configuration
@@ -160,6 +164,7 @@ class Handler:
 
 	def on_detectHwButton_clicked(self, button):
 		hw_l = detectHardware.get_relevant_info()
+		print(hw_l)
 		# empty hardware list before filling
 		while True:
 			row = hardware_listbox.get_row_at_index(0)
@@ -183,10 +188,13 @@ class Handler:
 			row.add(box)
 			hardware_listbox.add(row)
 			row.show_all()
-		#detected_hw_label.set_text(hw_str)
+		builder.get_object('autoDetectWrongMaybeLabel').show()
+		next_button.set_sensitive(True)
+		needed_packages_label.set_text(' '.join(driverMatcher.get_packages(hw_l)))
 
 	def on_manualOrAutoChooseListbox_row_selected(self, list, row):
-		current_config['manualauto']=row.value
+		if row.value:
+			current_config['manualauto']=row.value
 		if row.value == 'manual':
 			self._move_stack(1)
 		else:
