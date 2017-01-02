@@ -3,6 +3,13 @@
 import platform
 import getpass
 
+DISTROS = [
+    'arch',
+    'ubuntu',
+    'fedora',
+    'gentoo'
+]
+
 USERNAME=getpass.getuser()
 # AMD vendor: 'Advanced Micro Devices, Inc. [AMD/ATI]'
 

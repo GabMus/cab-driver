@@ -119,6 +119,30 @@ for i in range(0,2):
 	manual_auto_config_listbox.add(row)
 manual_auto_config_listbox.show_all()
 
+# fill manual distro popover listbox
+manual_distro_button = builder.get_object('manualChooseDistroButton')
+manual_distro_listbox = builder.get_object('manualChooseDistroPopoverListbox')
+manual_distro_label = builder.get_object('manualDistroLabel')
+manual_distro_icon = builder.get_object('manualDistroIcon')
+for d in driverMatcher.DISTROS:
+	box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+	label = Gtk.Label()
+	label.set_text(d.capitalize()) #set text to distro name
+	icon = Gtk.Image()
+	icon.set_from_file(IMG_PATH+'/'+d+'.png')
+	label.set_margin_left(12)
+	label.set_margin_right(12)
+	box.pack_start(icon, False, False, 0)
+	box.pack_start(label, False, False, 0)
+	row = Gtk.ListBoxRow()
+	row.value=d
+	row.add(box)
+	manual_distro_listbox.add(row)
+	row.show_all()
+manual_distro_listbox.show_all()
+manual_distro_listbox.select_row(None)
+manual_distro_popover = builder.get_object('manualChooseDistroPopover')
+
 class Handler:
 
 	def onDeleteWindow(self, *args):
@@ -200,6 +224,15 @@ class Handler:
 		else:
 			self._move_stack(2)
 		# next_button.set_sensitive(True)
+
+	def on_manualChooseDistroPopoverListbox_row_selected(self, list, row):
+		manual_distro_popover.hide()
+		manual_distro_label.set_text(row.value.capitalize())
+		manual_distro_icon.set_from_file(IMG_PATH+'/'+row.value+'.png')
+
+	def on_manualChooseDistroButton_clicked(self, button):
+		if not manual_distro_popover.get_visible():
+			manual_distro_popover.show()
 
 
 builder.connect_signals(Handler())
