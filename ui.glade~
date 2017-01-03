@@ -71,12 +71,18 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
               </packing>
             </child>
             <child>
-              <object class="GtkListBox" id="manualOrAutoChooseListbox">
+              <object class="GtkViewport">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">center</property>
                 <property name="valign">center</property>
-                <signal name="row-selected" handler="on_manualOrAutoChooseListbox_row_selected" swapped="no"/>
+                <child>
+                  <object class="GtkListBox" id="manualOrAutoChooseListbox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <signal name="row-selected" handler="on_manualOrAutoChooseListbox_row_selected" swapped="no"/>
+                  </object>
+                </child>
               </object>
               <packing>
                 <property name="name">page1</property>
@@ -132,16 +138,26 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                           </packing>
                         </child>
                         <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
                           <object class="GtkImage" id="manualDistroIcon">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="stock">gtk-dialog-question</property>
                             <property name="icon_size">6</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
-                            <property name="position">1</property>
+                            <property name="position">2</property>
                           </packing>
                         </child>
                         <child>
@@ -152,7 +168,7 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
-                            <property name="position">2</property>
+                            <property name="position">3</property>
                           </packing>
                         </child>
                       </object>
@@ -163,7 +179,40 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="spacing">12</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="label" translatable="yes">Hybrid graphics</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSwitch" id="manualHybridGFXSwitch">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
                     </child>
                     <child>
                       <placeholder/>
@@ -229,28 +278,37 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
-                </child>
-                <child>
-                  <object class="GtkListBox" id="hardwareListbox">
+                  <object class="GtkViewport">
+                    <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="no_show_all">True</property>
                     <property name="halign">center</property>
                     <property name="valign">center</property>
-                    <property name="selection_mode">none</property>
-                    <property name="activate_on_single_click">False</property>
+                    <child>
+                      <object class="GtkListBox" id="hardwareListbox">
+                        <property name="can_focus">False</property>
+                        <property name="no_show_all">True</property>
+                        <property name="selection_mode">none</property>
+                        <property name="activate_on_single_click">False</property>
+                      </object>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">3</property>
+                    <property name="position">2</property>
                   </packing>
+                </child>
+                <child>
+                  <placeholder/>
                 </child>
                 <child>
                   <object class="GtkLabel" id="autoDetectWrongMaybeLabel">
                     <property name="can_focus">False</property>
                     <property name="no_show_all">True</property>
-                    <property name="label" translatable="yes">Is this wrong? Go back and choose the manual configuration. Also please consider reporting an issue on the github repository</property>
+                    <property name="halign">center</property>
+                    <property name="label" translatable="yes">Is this wrong?
+Go back and choose the manual configuration.
+Also please consider reporting an issue on the github repository</property>
                     <property name="justify">center</property>
                     <property name="wrap">True</property>
                     <attributes>
@@ -259,7 +317,7 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                   </object>
                   <packing>
                     <property name="expand">False</property>
-                    <property name="fill">True</property>
+                    <property name="fill">False</property>
                     <property name="position">4</property>
                   </packing>
                 </child>
@@ -283,6 +341,7 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">_packages_</property>
+                    <property name="wrap">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -299,9 +358,6 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                 <property name="title" translatable="yes">page4</property>
                 <property name="position">4</property>
               </packing>
-            </child>
-            <child>
-              <placeholder/>
             </child>
           </object>
           <packing>
@@ -433,16 +489,24 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
     <property name="relative_to">manualChooseDistroButton</property>
     <property name="position">right</property>
     <child>
-      <object class="GtkListBox" id="manualChooseDistroPopoverListbox">
+      <object class="GtkScrolledWindow">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="margin_left">12</property>
-        <property name="margin_right">12</property>
-        <property name="margin_top">12</property>
-        <property name="margin_bottom">12</property>
-        <property name="selection_mode">browse</property>
-        <property name="activate_on_single_click">False</property>
-        <signal name="row-activated" handler="on_manualChooseDistroPopoverListbox_row_selected" swapped="no"/>
+        <property name="can_focus">True</property>
+        <property name="hscrollbar_policy">never</property>
+        <property name="shadow_type">in</property>
+        <property name="min_content_height">150</property>
+        <child>
+          <object class="GtkViewport">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkListBox" id="manualChooseDistroPopoverListbox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+              </object>
+            </child>
+          </object>
+        </child>
       </object>
     </child>
   </object>

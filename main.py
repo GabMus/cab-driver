@@ -188,7 +188,6 @@ class Handler:
 
 	def on_detectHwButton_clicked(self, button):
 		hw_l = detectHardware.get_relevant_info()
-		print(hw_l)
 		# empty hardware list before filling
 		while True:
 			row = hardware_listbox.get_row_at_index(0)
@@ -197,6 +196,22 @@ class Handler:
 			else:
 				break
 		# fill hardware list
+
+		# add distro row
+		box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+		label = Gtk.Label()
+		label.set_text(driverMatcher.get_distro().capitalize()) #set text to hw
+		icon = Gtk.Image()
+		icon.set_from_file(IMG_PATH+'/'+driverMatcher.get_distro()+'.png')
+		label.set_margin_left(12)
+		label.set_margin_right(12)
+		box.pack_start(icon, False, False, 0)
+		box.pack_start(label, False, False, 0)
+		row = Gtk.ListBoxRow()
+		row.add(box)
+		hardware_listbox.add(row)
+		row.show_all()
+
 		hardware_listbox.show()
 		for i in hw_l:
 			box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
@@ -212,6 +227,7 @@ class Handler:
 			row.add(box)
 			hardware_listbox.add(row)
 			row.show_all()
+
 		builder.get_object('autoDetectWrongMaybeLabel').show()
 		next_button.set_sensitive(True)
 		needed_packages_label.set_text(' '.join(driverMatcher.get_packages(hw_l)))
