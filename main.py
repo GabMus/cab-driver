@@ -6,6 +6,7 @@ import os
 import sys
 import detectHardware
 import driverMatcher
+import listboxHelper
 
 EXEC_FOLDER = os.path.realpath(os.path.dirname(__file__)) + "/"
 builder = Gtk.Builder()
@@ -104,17 +105,7 @@ moac_values = [
 	'manual'
 ]
 for i in range(0,2):
-	box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-	label = Gtk.Label()
-	label.set_text(moac_labels[i])
-	icon = Gtk.Image()
-	icon.set_from_file(moac_pics[i])
-	label.set_margin_left(12)
-	label.set_margin_right(12)
-	box.pack_start(icon, False, False, 0)
-	box.pack_start(label, False, False, 0)
-	row = Gtk.ListBoxRow()
-	row.add(box)
+	row=listboxHelper.make_image_row(moac_labels[i], moac_pics[i])
 	row.value = moac_values[i]
 	manual_auto_config_listbox.add(row)
 manual_auto_config_listbox.show_all()
@@ -125,18 +116,7 @@ manual_distro_listbox = builder.get_object('manualChooseDistroPopoverListbox')
 manual_distro_label = builder.get_object('manualDistroLabel')
 manual_distro_icon = builder.get_object('manualDistroIcon')
 for d in driverMatcher.DISTROS:
-	box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-	label = Gtk.Label()
-	label.set_text(d.capitalize()) #set text to distro name
-	icon = Gtk.Image()
-	icon.set_from_file(IMG_PATH+'/'+d+'.png')
-	label.set_margin_left(12)
-	label.set_margin_right(12)
-	box.pack_start(icon, False, False, 0)
-	box.pack_start(label, False, False, 0)
-	row = Gtk.ListBoxRow()
-	row.value=d
-	row.add(box)
+	row=listboxHelper.make_image_row(d.capitalize(), IMG_PATH+'/'+d+'.png')
 	manual_distro_listbox.add(row)
 	row.show_all()
 manual_distro_listbox.show_all()
@@ -198,33 +178,15 @@ class Handler:
 		# fill hardware list
 
 		# add distro row
-		box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-		label = Gtk.Label()
-		label.set_text(driverMatcher.get_distro().capitalize()) #set text to hw
-		icon = Gtk.Image()
-		icon.set_from_file(IMG_PATH+'/'+driverMatcher.get_distro()+'.png')
-		label.set_margin_left(12)
-		label.set_margin_right(12)
-		box.pack_start(icon, False, False, 0)
-		box.pack_start(label, False, False, 0)
-		row = Gtk.ListBoxRow()
-		row.add(box)
-		hardware_listbox.add(row)
-		row.show_all()
+		distro_row=listboxHelper.make_image_row(
+			driverMatcher.get_distro().capitalize(),
+			IMG_PATH+'/'+driverMatcher.get_distro()+'.png')
+		hardware_listbox.add(distro_row)
+		distro_row.show_all()
 
 		hardware_listbox.show()
 		for i in hw_l:
-			box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-			label = Gtk.Label()
-			label.set_text(i[0]+' '+i[1]) #set text to hw
-			icon = Gtk.Image()
-			icon.set_from_file(VENDOR_ICONS[i[0]])
-			label.set_margin_left(12)
-			label.set_margin_right(12)
-			box.pack_start(icon, False, False, 0)
-			box.pack_start(label, False, False, 0)
-			row = Gtk.ListBoxRow()
-			row.add(box)
+			row=listboxHelper.make_image_row(i[0]+' '+i[1], VENDOR_ICONS[i[0]])
 			hardware_listbox.add(row)
 			row.show_all()
 
@@ -250,6 +212,9 @@ class Handler:
 		if not manual_distro_popover.get_visible():
 			manual_distro_popover.show()
 
+	#def on_GPU1SearchEntry_changed(self, *args):
+	#	builder.get_object('GPUEntrycompletion').complete()
+	#	print('dicks')
 
 builder.connect_signals(Handler())
 
