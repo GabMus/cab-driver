@@ -63,14 +63,15 @@ current_config={
 	'gpu1_vendor': None,
 	'gpu2_vendor': None,
 	'gpu1_model': None,
-	'gpu2_model': None
+	'gpu2_model': None,
+	'packages': None,
 }
 
-mainstack_special_pages = [ # page indexes where the next button should be locked waiting for user interaction
+mainstack_special_pages = [ # page indexes where the next button should be locked
 	1, # choose auto detect or manual config
 ]
 
-mainstack_interact_pages = [
+mainstack_interact_pages = [ # pages that need user interaction
 	2, # manual config menu, need to finish configuration
 	3, # autodetect page, need to press autodetect button
 ]
@@ -200,6 +201,8 @@ def is_config_set():
 	else:
 		return False
 
+packages_to_install_listbox = builder.get_object('packagesToInstallListbox')
+
 class Handler:
 
 	def onDeleteWindow(self, *args):
@@ -211,17 +214,12 @@ class Handler:
 			main_stack.get_visible_child()
 		)
 
-		# general cases
-		next_button.set_sensitive(
-			current_child_index < len(main_stack_children)-1
-		)
 		back_button.set_sensitive(
 			current_child_index > 0
 		)
 
-		# special cases
 		next_button.set_sensitive(
-			not current_child_index in mainstack_special_pages
+			not current_child_index in mainstack_special_pages and current_child_index < len(main_stack_children)-1
 		)
 
 		if current_child_index in mainstack_interact_pages:
@@ -242,9 +240,12 @@ class Handler:
 			main_stack.get_visible_child()
 		)
 		if current_child_index in mainstack_interact_pages:
-			needed_packages_label.set_text(
-				' '.join(driverMatcher.get_packages(current_config))
-			)
+			current_config['packages'] = driverMatcher.get_packages(current_config)
+			listboxHelper.empty_listbox(packages_to_install_listbox)
+			for p in current_config['packages']:
+				row = listboxHelper.make_row(p)
+				packages_to_install_listbox.add(row)
+				row.show_all()
 		if current_child_index in special_pages_directions.keys():
 			self._move_stack(special_pages_directions[current_child_index])
 		else:
