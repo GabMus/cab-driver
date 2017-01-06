@@ -2,58 +2,6 @@
 <!-- Generated with glade 3.20.0 -->
 <interface>
   <requires lib="gtk+" version="3.18"/>
-  <object class="GtkPopover" id="manualChooseGPU1VendorPopover">
-    <property name="can_focus">False</property>
-    <property name="relative_to">manualChooseDistroButton</property>
-    <property name="position">right</property>
-    <child>
-      <object class="GtkScrolledWindow">
-        <property name="visible">True</property>
-        <property name="can_focus">True</property>
-        <property name="hscrollbar_policy">never</property>
-        <property name="shadow_type">in</property>
-        <property name="min_content_height">150</property>
-        <child>
-          <object class="GtkViewport">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <object class="GtkListBox" id="manualChooseGPU1VendorPopoverListbox">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-            </child>
-          </object>
-        </child>
-      </object>
-    </child>
-  </object>
-  <object class="GtkPopover" id="manualChooseGPU2VendorPopover">
-    <property name="can_focus">False</property>
-    <property name="relative_to">manualChooseDistroButton</property>
-    <property name="position">right</property>
-    <child>
-      <object class="GtkScrolledWindow">
-        <property name="visible">True</property>
-        <property name="can_focus">True</property>
-        <property name="hscrollbar_policy">never</property>
-        <property name="shadow_type">in</property>
-        <property name="min_content_height">150</property>
-        <child>
-          <object class="GtkViewport">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <child>
-              <object class="GtkListBox" id="manualChooseGPU2VendorPopoverListbox">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-            </child>
-          </object>
-        </child>
-      </object>
-    </child>
-  </object>
   <object class="GtkApplicationWindow" id="window">
     <property name="width_request">600</property>
     <property name="height_request">400</property>
@@ -175,13 +123,10 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                         <property name="can_focus">False</property>
                         <property name="spacing">12</property>
                         <child>
-                          <object class="GtkButton" id="manualChooseDistroButton">
-                            <property name="label" translatable="yes">Linux Distribution</property>
+                          <object class="GtkLabel">
                             <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <property name="valign">center</property>
-                            <signal name="clicked" handler="on_manualChooseDistroButton_clicked" swapped="no"/>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">Linux Distribution</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -201,26 +146,18 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkImage" id="manualDistroIcon">
+                          <object class="GtkButton" id="manualChooseDistroButton">
+                            <property name="label" translatable="yes">Choose distro</property>
                             <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                            <property name="icon_size">6</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="valign">center</property>
+                            <signal name="clicked" handler="on_manualChooseDistroButton_clicked" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">2</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel" id="manualDistroLabel">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">3</property>
                           </packing>
                         </child>
                       </object>
@@ -252,6 +189,7 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                           <object class="GtkSwitch" id="manualHybridGFXSwitch">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
+                            <signal name="state-set" handler="on_manualHybridGFXSwitch_state_set" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -296,11 +234,12 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="manualChooseGPU1Vendor">
+                          <object class="GtkButton" id="manualChooseGPU1VendorButton">
                             <property name="label" translatable="yes">Vendor</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_manualChooseGPU1VendorButton_clicked" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -309,11 +248,13 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="manualChooseGPU1Model">
+                          <object class="GtkButton" id="manualChooseGPU1ModelButton">
                             <property name="label" translatable="yes">Model</property>
                             <property name="visible">True</property>
+                            <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_manualChooseGPU1ModelButton_clicked" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -329,7 +270,68 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
+                      <object class="GtkBox" id="GPU2Box">
+                        <property name="can_focus">False</property>
+                        <property name="no_show_all">True</property>
+                        <property name="spacing">24</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="label" translatable="yes">GPU 2</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="manualChooseGPU2VendorButton">
+                            <property name="label" translatable="yes">Vendor</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_manualChooseGPU2VendorButton_clicked" swapped="no"/>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="manualChooseGPU2ModelButton">
+                            <property name="label" translatable="yes">Model</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <signal name="clicked" handler="on_manualChooseGPU2ModelButton_clicked" swapped="no"/>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">3</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">3</property>
+                      </packing>
                     </child>
                     <child>
                       <placeholder/>
@@ -345,7 +347,6 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                   <object class="GtkViewport" id="manualResultViewport">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="valign">center</property>
                     <child>
                       <object class="GtkBox" id="manualResultBox">
                         <property name="visible">True</property>
@@ -355,6 +356,8 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                           <object class="GtkListBox" id="manualResultDistroListbox">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="selection_mode">none</property>
+                            <property name="activate_on_single_click">False</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -366,6 +369,8 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                           <object class="GtkListBox" id="manualResultGPU1Listbox">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="selection_mode">none</property>
+                            <property name="activate_on_single_click">False</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -377,6 +382,8 @@ Sit back, relax and go on by pressing the "Next" button up in the header bar.</p
                           <object class="GtkListBox" id="manualResultGPU2Listbox">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="selection_mode">none</property>
+                            <property name="activate_on_single_click">False</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -664,6 +671,114 @@ Also please consider reporting an issue on the github repository</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <signal name="row-activated" handler="on_manualChooseDistroPopoverListbox_row_selected" swapped="no"/>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkPopover" id="manualChooseGPU1ModelPopover">
+    <property name="can_focus">False</property>
+    <property name="relative_to">manualChooseGPU1ModelButton</property>
+    <property name="position">right</property>
+    <child>
+      <object class="GtkScrolledWindow">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="hscrollbar_policy">never</property>
+        <property name="shadow_type">in</property>
+        <property name="min_content_height">150</property>
+        <child>
+          <object class="GtkViewport">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkListBox" id="manualChooseGPU1ModelPopoverListbox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <signal name="row-activated" handler="on_manualChooseGPU1ModelPopoverListbox_row_activated" swapped="no"/>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkPopover" id="manualChooseGPU1VendorPopover">
+    <property name="can_focus">False</property>
+    <property name="relative_to">manualChooseGPU1VendorButton</property>
+    <property name="position">right</property>
+    <child>
+      <object class="GtkScrolledWindow">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="hscrollbar_policy">never</property>
+        <property name="shadow_type">in</property>
+        <property name="min_content_height">150</property>
+        <child>
+          <object class="GtkViewport">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkListBox" id="manualChooseGPU1VendorPopoverListbox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <signal name="row-activated" handler="on_manualChooseGPU1VendorPopoverListbox_row_activated" swapped="no"/>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkPopover" id="manualChooseGPU2ModelPopover">
+    <property name="can_focus">False</property>
+    <property name="relative_to">manualChooseGPU2ModelButton</property>
+    <property name="position">right</property>
+    <child>
+      <object class="GtkScrolledWindow">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="hscrollbar_policy">never</property>
+        <property name="shadow_type">in</property>
+        <property name="min_content_height">150</property>
+        <child>
+          <object class="GtkViewport">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkListBox" id="manualChooseGPU2ModelPopoverListbox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <signal name="row-activated" handler="on_manualChooseGPU2ModelPopoverListbox_row_activated" swapped="no"/>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkPopover" id="manualChooseGPU2VendorPopover">
+    <property name="can_focus">False</property>
+    <property name="relative_to">manualChooseGPU2VendorButton</property>
+    <property name="position">right</property>
+    <child>
+      <object class="GtkScrolledWindow">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="hscrollbar_policy">never</property>
+        <property name="shadow_type">in</property>
+        <property name="min_content_height">150</property>
+        <child>
+          <object class="GtkViewport">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkListBox" id="manualChooseGPU2VendorPopoverListbox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <signal name="row-activated" handler="on_manualChooseGPU2VendorPopoverListbox_row_activated" swapped="no"/>
               </object>
             </child>
           </object>

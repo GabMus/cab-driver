@@ -26,3 +26,11 @@ def make_row(text):
     row = Gtk.ListBoxRow()
     row.add(box)
     return row
+
+def empty_listbox(listbox):
+    while True:
+        row = listbox.get_row_at_index(0)
+        if row:
+            listbox.remove(row)
+        else:
+            break

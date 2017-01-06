@@ -57,12 +57,21 @@ app = App()
 
 #dictionary for storing current config
 current_config={
-	'manualauto': '', # valid: 'manual', 'auto'
-	'hybrid': '', #valid: 'no', 'intelnvidia', 'intelamd', 'amdnvidia', 'amdamd'
+	'manualauto': None, # valid: 'manual', 'auto'
+	'hybrid': False,
+	'distro': None,
+	'gpu1_vendor': None,
+	'gpu2_vendor': None,
+	'gpu1_model': None,
+	'gpu2_model': None
 }
 
 mainstack_special_pages = [ # page indexes where the next button should be locked waiting for user interaction
 	1, # choose auto detect or manual config
+]
+
+mainstack_interact_pages = [
+	2, # manual config menu, need to finish configuration
 	3, # autodetect page, need to press autodetect button
 ]
 
@@ -75,7 +84,7 @@ IMG_PATH = EXEC_FOLDER+'/img/'
 VENDOR_ICONS = {
 	'NVIDIA Corporation': IMG_PATH+'nvidia-small.jpg',
 	'Intel Corporation': IMG_PATH+'intel-small.jpg',
-	# 'AMD WHATEVER': IMG_PATH+'amd-small.jpg'
+	'Advanced Micro Devices, Inc. [AMD/ATI]': IMG_PATH+'amd-small.jpg'
 }
 
 main_stack = builder.get_object('mainStack')
@@ -116,17 +125,107 @@ manual_distro_listbox = builder.get_object('manualChooseDistroPopoverListbox')
 manual_distro_label = builder.get_object('manualDistroLabel')
 manual_distro_icon = builder.get_object('manualDistroIcon')
 for d in driverMatcher.DISTROS:
-	row=listboxHelper.make_image_row(d.capitalize(), IMG_PATH+'/'+d+'.png')
+	row = listboxHelper.make_image_row(d.capitalize(), IMG_PATH+'/'+d+'.png')
+	row.value = d
 	manual_distro_listbox.add(row)
 	row.show_all()
 manual_distro_listbox.show_all()
 manual_distro_listbox.select_row(None)
 manual_distro_popover = builder.get_object('manualChooseDistroPopover')
 
+# fill vendor listbox
+def fill_vendor_listbox(listbox, gpu1_vendor=None):
+	listboxHelper.empty_listbox(listbox)
+	for vendor in driverMatcher.VENDORS:
+		if not gpu1_vendor == vendor:
+			row = listboxHelper.make_image_row(vendor, VENDOR_ICONS[vendor])
+			row.value = vendor
+			listbox.add(row)
+			row.show_all()
+
+manual_gpu1_vendor_listbox = builder.get_object('manualChooseGPU1VendorPopoverListbox')
+manual_gpu2_vendor_listbox = builder.get_object('manualChooseGPU2VendorPopoverListbox')
+fill_vendor_listbox(manual_gpu1_vendor_listbox)
+# gpu2 vendor populated accordingly to gpu1
+manual_gpu1_model_listbox = builder.get_object('manualChooseGPU1ModelPopoverListbox')
+manual_gpu2_model_listbox = builder.get_object('manualChooseGPU2ModelPopoverListbox')
+
+manual_gpu1_vendor_popover = builder.get_object('manualChooseGPU1VendorPopover')
+manual_gpu2_vendor_popover = builder.get_object('manualChooseGPU2VendorPopover')
+manual_gpu1_model_popover = builder.get_object('manualChooseGPU1ModelPopover')
+manual_gpu2_model_popover = builder.get_object('manualChooseGPU2ModelPopover')
+
+def fill_manual_model_listbox(vendor, listbox):
+	listboxHelper.empty_listbox(listbox)
+	if vendor == 'NVIDIA Corporation':
+		for model in driverMatcher.NVIDIA_FAMILY_CARDS:
+			row = listboxHelper.make_row(model)
+			row.value=model
+			listbox.add(row)
+			row.show_all()
+	elif vendor == 'Intel Corporation':
+		row = listboxHelper.make_row('Any Intel GPU')
+		row.value='Any Intel GPU'
+		listbox.add(row)
+		row.show_all()
+	# TODO: add case for AMD GPUs
+	else:
+		raise ValueError('Vendor not recognised')
+
+def empty_config():
+	current_config['manualauto'] = None
+	current_config['distro'] = None
+	current_config['gpu1_vendor'] = None
+	current_config['gpu2_vendor'] = None
+	current_config['gpu1_model'] = None
+	current_config['gpu2_model'] = None
+	current_config['hybrid'] = False
+	listboxHelper.empty_listbox(
+		builder.get_object('manualResultDistroListbox')
+	)
+	listboxHelper.empty_listbox(
+		builder.get_object('manualResultGPU1Listbox')
+	)
+	listboxHelper.empty_listbox(
+		builder.get_object('manualResultGPU2Listbox')
+	)
+	listboxHelper.empty_listbox(hardware_listbox)
+	builder.get_object('autoDetectWrongMaybeLabel').hide()
+	manual_auto_config_listbox.select_row(None)
+
+
+def is_config_set():
+	if (not current_config['hybrid'] or current_config['gpu2_model']) and current_config['gpu1_model'] and current_config['distro']:
+		return True
+	else:
+		return False
+
 class Handler:
 
 	def onDeleteWindow(self, *args):
 		app.quit()
+
+	def _set_next_back_btn_state(self):
+		# get current child index
+		current_child_index = main_stack_children.index(
+			main_stack.get_visible_child()
+		)
+
+		# general cases
+		next_button.set_sensitive(
+			current_child_index < len(main_stack_children)-1
+		)
+		back_button.set_sensitive(
+			current_child_index > 0
+		)
+
+		# special cases
+		next_button.set_sensitive(
+			not current_child_index in mainstack_special_pages
+		)
+
+		if current_child_index in mainstack_interact_pages:
+			next_button.set_sensitive(is_config_set())
 
 	def _move_stack(self, direction):
 		current_child_index = main_stack_children.index(
@@ -136,23 +235,17 @@ class Handler:
 			main_stack_children[current_child_index+direction]
 		)
 
-		if current_child_index+direction >= len(main_stack_children)-1:
-			next_button.set_sensitive(False)
-			back_button.set_sensitive(True)
-		elif current_child_index+direction <= 0:
-			next_button.set_sensitive(True)
-			back_button.set_sensitive(False)
-		else:
-			next_button.set_sensitive(True)
-			back_button.set_sensitive(True)
-		if current_child_index + direction in mainstack_special_pages:
-			next_button.set_sensitive(False)
+		self._set_next_back_btn_state()
 
 	def on_nextButton_clicked(self, button):
 		current_child_index = main_stack_children.index(
 			main_stack.get_visible_child()
 		)
-		if current_child_index in special_pages_directions:
+		if current_child_index in mainstack_interact_pages:
+			needed_packages_label.set_text(
+				' '.join(driverMatcher.get_packages(current_config))
+			)
+		if current_child_index in special_pages_directions.keys():
 			self._move_stack(special_pages_directions[current_child_index])
 		else:
 			self._move_stack(1)
@@ -161,7 +254,11 @@ class Handler:
 		current_child_index = -1 * (main_stack_children.index(
 			main_stack.get_visible_child()
 		))
-		if current_child_index in special_pages_directions.keys():
+		if current_child_index*-1 in mainstack_interact_pages:
+			empty_config()
+		if current_child_index == -4 and current_config['manualauto'] == 'manual':
+			self._move_stack(-2)
+		elif current_child_index in special_pages_directions.keys():
 			self._move_stack(special_pages_directions[current_child_index])
 		else:
 			self._move_stack(-1)
@@ -169,13 +266,7 @@ class Handler:
 	def on_detectHwButton_clicked(self, button):
 		hw_l = detectHardware.get_relevant_info()
 		# empty hardware list before filling
-		while True:
-			row = hardware_listbox.get_row_at_index(0)
-			if row:
-				hardware_listbox.remove(row)
-			else:
-				break
-		# fill hardware list
+		listboxHelper.empty_listbox(hardware_listbox)
 
 		# add distro row
 		distro_row=listboxHelper.make_image_row(
@@ -183,16 +274,21 @@ class Handler:
 			IMG_PATH+'/'+driverMatcher.get_distro()+'.png')
 		hardware_listbox.add(distro_row)
 		distro_row.show_all()
-
 		hardware_listbox.show()
 		for i in hw_l:
 			row=listboxHelper.make_image_row(i[0]+' '+i[1], VENDOR_ICONS[i[0]])
 			hardware_listbox.add(row)
 			row.show_all()
-
 		builder.get_object('autoDetectWrongMaybeLabel').show()
-		next_button.set_sensitive(True)
-		needed_packages_label.set_text(' '.join(driverMatcher.get_packages(hw_l)))
+
+		current_config['hybrid'] = (len(hw_l) > 1)
+		current_config['distro'] = driverMatcher.get_distro()
+		current_config['gpu1_vendor'] = hw_l[0][0]
+		current_config['gpu1_model'] = hw_l[0][1]
+		if current_config['hybrid']:
+			current_config['gpu2_vendor'] = hw_l[1][0]
+			current_config['gpu2_model'] = hw_l[1][1]
+		self._set_next_back_btn_state()
 
 	def on_manualOrAutoChooseListbox_row_selected(self, list, row):
 		if row.value:
@@ -205,16 +301,123 @@ class Handler:
 
 	def on_manualChooseDistroPopoverListbox_row_selected(self, list, row):
 		manual_distro_popover.hide()
-		manual_distro_label.set_text(row.value.capitalize())
-		manual_distro_icon.set_from_file(IMG_PATH+'/'+row.value+'.png')
+		distro_result_listbox=builder.get_object('manualResultDistroListbox')
+		listboxHelper.empty_listbox(distro_result_listbox)
+		nrow = listboxHelper.make_image_row(
+			row.value.capitalize(),
+			IMG_PATH+'/'+row.value+'.png'
+		)
+		distro_result_listbox.add(nrow)
+		nrow.show_all()
+		current_config['distro'] = row.value
+		if current_config['gpu1_model'] and (not current_config['hybrid'] or current_config['gpu2_model']):
+			next_button.set_sensitive(True)
+		else:
+			next_button.set_sensitive(False)
 
 	def on_manualChooseDistroButton_clicked(self, button):
 		if not manual_distro_popover.get_visible():
 			manual_distro_popover.show()
 
-	#def on_GPU1SearchEntry_changed(self, *args):
-	#	builder.get_object('GPUEntrycompletion').complete()
-	#	print('dicks')
+	def on_manualChooseGPU1VendorButton_clicked(self, button):
+		if not manual_gpu1_vendor_popover.get_visible():
+			manual_gpu1_vendor_popover.show()
+
+	def on_manualChooseGPU1ModelButton_clicked(self, button):
+		if not manual_gpu1_model_popover.get_visible():
+			manual_gpu1_model_popover.show()
+
+	def on_manualChooseGPU2VendorButton_clicked(self, button):
+		if not manual_gpu2_vendor_popover.get_visible():
+			manual_gpu2_vendor_popover.show()
+
+	def on_manualChooseGPU2ModelButton_clicked(self, button):
+		if not manual_gpu2_model_popover.get_visible():
+			manual_gpu2_model_popover.show()
+
+	def on_manualChooseGPU1VendorPopoverListbox_row_activated(self, list, row):
+		listboxHelper.empty_listbox(
+			builder.get_object('manualResultGPU1Listbox')
+		)
+		listboxHelper.empty_listbox(
+			builder.get_object('manualResultGPU2Listbox')
+		)
+		current_config['gpu1_model'] = None
+		current_config['gpu2_model'] = None
+		next_button.set_sensitive(False)
+		fill_manual_model_listbox(row.value, manual_gpu1_model_listbox)
+		current_config['gpu1_vendor'] = row.value
+		if current_config['hybrid']:
+			builder.get_object('GPU2Box').show()
+		fill_vendor_listbox(
+			manual_gpu2_vendor_listbox,
+			row.value
+		)
+		manual_gpu1_vendor_popover.hide()
+		builder.get_object('manualChooseGPU1ModelButton').set_sensitive(True)
+
+	def on_manualChooseGPU1ModelPopoverListbox_row_activated(self, list, row):
+		gpu1_result_listbox = builder.get_object('manualResultGPU1Listbox')
+		listboxHelper.empty_listbox(gpu1_result_listbox)
+		nrow = listboxHelper.make_image_row(
+			current_config['gpu1_vendor']+' '+row.value,
+			VENDOR_ICONS[current_config['gpu1_vendor']]
+		)
+		gpu1_result_listbox.add(nrow)
+		nrow.show_all()
+		current_config['gpu1_model'] = row.value
+		manual_gpu1_model_popover.hide()
+		if (not current_config['hybrid'] or current_config['gpu2_model']) and current_config['distro']:
+			next_button.set_sensitive(True)
+		else:
+			next_button.set_sensitive(False)
+
+	def on_manualChooseGPU2VendorPopoverListbox_row_activated(self, list, row):
+		listboxHelper.empty_listbox(
+			builder.get_object('manualResultGPU2Listbox')
+		)
+		next_button.set_sensitive(False)
+		current_config['gpu2_model'] = None
+		fill_manual_model_listbox(row.value, manual_gpu2_model_listbox)
+		current_config['gpu2_vendor'] = row.value
+		manual_gpu2_vendor_popover.hide()
+		builder.get_object('manualChooseGPU2ModelButton').set_sensitive(True)
+
+	def on_manualChooseGPU2ModelPopoverListbox_row_activated(self, list, row):
+		gpu2_result_listbox = builder.get_object('manualResultGPU2Listbox')
+		listboxHelper.empty_listbox(gpu2_result_listbox)
+		nrow = listboxHelper.make_image_row(
+			current_config['gpu2_vendor']+' '+row.value,
+			VENDOR_ICONS[current_config['gpu2_vendor']]
+		)
+		gpu2_result_listbox.add(nrow)
+		nrow.show_all()
+		current_config['gpu2_model'] = row.value
+		manual_gpu2_model_popover.hide()
+		if current_config['distro'] and current_config['gpu1_model']:
+			next_button.set_sensitive(True)
+
+	def on_manualHybridGFXSwitch_state_set(self, switch, state):
+		if state:
+			current_config['hybrid']=True
+			if current_config['gpu1_model'] and current_config['gpu1_vendor']:
+				builder.get_object('GPU2Box').show()
+			else:
+				builder.get_object('GPU2Box').hide()
+			if current_config['gpu2_model'] and current_config['gpu1_model'] and current_config['distro']:
+				next_button.set_sensitive(True)
+			else:
+				next_button.set_sensitive(False)
+		else:
+			current_config['hybrid']=False
+			builder.get_object('GPU2Box').hide()
+			listboxHelper.empty_listbox(
+				builder.get_object('manualResultGPU2Listbox')
+			)
+			if current_config['gpu1_model'] and current_config['distro']:
+				next_button.set_sensitive(True)
+			else:
+				next_button.set_sensitive(False)
 
 builder.connect_signals(Handler())
 
