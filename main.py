@@ -7,6 +7,7 @@ import sys
 import detectHardware
 import driverMatcher
 import listboxHelper
+import packagekitHelper
 
 EXEC_FOLDER = os.path.realpath(os.path.dirname(__file__)) + "/"
 builder = Gtk.Builder()
@@ -69,6 +70,10 @@ current_config={
 
 mainstack_special_pages = [ # page indexes where the next button should be locked
 	1, # choose auto detect or manual config
+	4, # ready page
+	-5, # semi-final installing page, cant going back
+	5, # semi-final installing page
+	-6,
 ]
 
 mainstack_interact_pages = [ # pages that need user interaction
@@ -203,6 +208,19 @@ def is_config_set():
 
 packages_to_install_listbox = builder.get_object('packagesToInstallListbox')
 
+install_progressbar = builder.get_object('installationProgressbar')
+install_progress_listbox = builder.get_object('installationProgressListbox')
+
+install_spinner = builder.get_object('installingSpinner')
+
+install_thread_return_val=[False]
+
+def wait_for_thread(thread):
+	while thread.is_alive():
+		while Gtk.events_pending():
+			Gtk.main_iteration()
+	return
+
 class Handler:
 
 	def onDeleteWindow(self, *args):
@@ -221,6 +239,9 @@ class Handler:
 		next_button.set_sensitive(
 			not current_child_index in mainstack_special_pages and current_child_index < len(main_stack_children)-1
 		)
+
+		if (-1 * current_child_index) in mainstack_special_pages:
+			back_button.set_sensitive(False)
 
 		if current_child_index in mainstack_interact_pages:
 			next_button.set_sensitive(is_config_set())
@@ -255,6 +276,7 @@ class Handler:
 		current_child_index = -1 * (main_stack_children.index(
 			main_stack.get_visible_child()
 		))
+
 		if current_child_index*-1 in mainstack_interact_pages:
 			empty_config()
 		if current_child_index == -4 and current_config['manualauto'] == 'manual':
@@ -419,6 +441,40 @@ class Handler:
 				next_button.set_sensitive(True)
 			else:
 				next_button.set_sensitive(False)
+
+	def on_installButton_clicked(self, button):
+		popover = builder.get_object('popoverInstallConfirmation')
+		if not popover.get_visible():
+			popover.show()
+
+	# percent current / tot
+
+	#def _install_packages(self, name_list):
+		# TODO: implement with progress
+		#listboxHelper.empty_listbox(packages_to_install_listbox)
+		#tot_steps = len(name_list)
+		#current_step = 0
+		#for n in name_list:
+		#	row = listboxHelper.make_row('Installing '+name+'...')
+		#	packages_to_install_listbox.add(row)
+		#	row.show_all()
+
+	def on_installConfirmYesButton_clicked(self, button):
+		builder.get_object('popoverInstallConfirmation').hide()
+		self._move_stack(1)
+		install_spinner.start()
+
+		t = packagekitHelper.do_async(
+			packagekitHelper.install_multi_pkgs,
+			(current_config['packages'], install_thread_return_val)
+		)
+		wait_for_thread(t)
+		install_spinner.stop()
+		if install_thread_return_val[0]:
+			self._move_stack(1)
+
+	def on_installConfirmNoButton_clicked(self, button):
+		builder.get_object('popoverInstallConfirmation').hide()
 
 builder.connect_signals(Handler())
 

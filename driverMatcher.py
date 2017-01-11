@@ -101,6 +101,14 @@ drivers_dict={
             'nvidia-utils',
             'libva-vdpau-driver',
             'nvidia-settings'
+        ],
+        'ubuntu1604': [
+            'nvidia-367',
+            'vdpau-driver-all',
+            'libvdpau1',
+            'libxnvctrl0',
+            'libcuda1',
+            'nvidia-settings'
         ]
         # distro specific package names
     },
@@ -111,6 +119,14 @@ drivers_dict={
             'nvidia-utils',
             'libva-vdpau-driver',
             'nvidia-settings'
+        ],
+        'ubuntu1604': [
+            'nvidia-340-updates',
+            'vdpau-driver-all',
+            'libvdpau1',
+            'libxnvctrl0',
+            'libcuda1-340-updates',
+            'nvidia-settings'
         ]
     },
     'nvidia304xx': {
@@ -120,6 +136,25 @@ drivers_dict={
             'nvidia-utils',
             'libva-vdpau-driver',
             'nvidia-settings'
+        ],
+        'ubuntu1604': [
+            'nvidia-304-updates',
+            'vdpau-driver-all',
+            'libvdpau1',
+            'libxnvctrl0',
+            'libcuda1-304-updates',
+            'nvidia-settings'
+        ]
+    },
+    'nvidiaprime': {
+        'ubuntu1604': [
+            'nvidia-340-updates',
+            'vdpau-driver-all',
+            'libvdpau1',
+            'libxnvctrl0',
+            'libcuda1-340-updates',
+            'nvidia-settings',
+
         ]
     },
     'bumblebee': { # inherits nvidia(or nvidia legacy) and intel
@@ -127,7 +162,7 @@ drivers_dict={
             'bumblebee',
             'mesa',
             'nvidia',
-            'nvidia-libgl',
+            #'nvidia-libgl',
             'nvidia-utils',
             'libva-vdpau-driver',
             'nvidia-settings',
@@ -151,6 +186,9 @@ drivers_dict={
             'mesa-libgl',
             'libva-intel-driver',
             'libvdpau-va-gl'
+        ],
+        'ubuntu1604': [
+            'xserver-xorg-video-intel',
         ]
     },
     'amdgpu': {
