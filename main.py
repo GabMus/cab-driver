@@ -461,6 +461,8 @@ class Handler:
 
 	def on_installConfirmYesButton_clicked(self, button):
 		builder.get_object('popoverInstallConfirmation').hide()
+		allgood_box = builder.get_object('allgoodBox')
+		bad_box = builder.get_object('badBox')
 		self._move_stack(1)
 		install_spinner.start()
 
@@ -470,8 +472,21 @@ class Handler:
 		)
 		wait_for_thread(t)
 		install_spinner.stop()
+
+	#	if sys.argv[1]:
+	#		if sys.argv[1]=='--dummy':
+	#			if sys.argv[2]:
+	#				if sys.argv[2]=='--fail':
+	#					# something
+	#			else:
 		if install_thread_return_val[0]:
-			self._move_stack(1)
+			allgood_box.show()
+			bad_box.hide()
+		else:
+			allgood_box.show()
+			bad_box.hide()
+
+		self._move_stack(1)
 
 	def on_installConfirmNoButton_clicked(self, button):
 		builder.get_object('popoverInstallConfirmation').hide()
