@@ -38,7 +38,7 @@ def _is_optimus(gpu1, gpu2): # returns true if gpu1 is intel and gpu2 is nvidia 
     else:
         return False
 
-def _is_prime(gpu1, gpu2):
+def _is_intelamd(gpu1, gpu2):
     #return False # DONE: get output of lspci with amd cards to actually implement this
     if gpu1 == 'Intel Corporation':
         if gpu2 == 'Advanced Micro Devices, Inc. [AMD/ATI]':
@@ -61,8 +61,8 @@ def get_correct_drivers(hw_l, distro): # TODO: add cases for bumblebee with lega
     if len(hw_l) > 1:
         if _is_optimus(hw_l[0][0], hw_l[1][0]):
             current_driver_config['driver']='bumblebee'
-        elif _is_prime(hw_l[0][0], hw_l[1][0]): # TODO: implement prime
-            pass
+        elif _is_intelamd(hw_l[0][0], hw_l[1][0]): # TODO: implement prime
+            current_driver_config['driver']='intelamd'
     else:
         if hw_l[0][0] == 'NVIDIA Corporation':
             if hw_l[0][1] in NVIDIA_LEGACY_340XX_CARDS:
@@ -197,7 +197,7 @@ drivers_dict={
         ],
         'ubuntu1604': [
             'xserver-xorg-video-intel',
-        ]
+        ],
     },
     'amdgpu': {
         'arch': [
@@ -205,8 +205,17 @@ drivers_dict={
             'mesa-libgl',
             'libva-mesa-driver',
             'mesa-vdpau'
-        ]
+        ],
     },
+    'intelamd': {
+        'arch': [
+            'xf86-video-amdgpu',
+            'xf86-video-intel',
+            'mesa-libgl',
+            'libva-mesa-driver',
+            'mesa-vdpau'
+        ],
+    }
     #'amdgpupro': {
     #
     #}
@@ -226,5 +235,9 @@ post_install_actions = {
             'if groups '+ USERNAME +' | grep &>/dev/null \"\\bbumblebee\\b\"; then true; else pkexec gpasswd -a '+ USERNAME +' bumblebee; fi',
             'pkexec systemctl enable bumblebeed.service'
         ]
-    }
+    },
+    # 'intelamd' # Not necessary
+    ## xrandr --setprovideroffloadsink radeon Intel
+    # From the Arch Wiki
+    # This setting is no longer necessary when using the default intel/modesetting driver from the official repos, as they have DRI3 enabled by default and will therefore automatically make these assignments. Explicitly setting them again does no harm, though.
 }
