@@ -66,6 +66,7 @@ current_config={
 	'gpu1_model': None,
 	'gpu2_model': None,
 	'packages': None,
+	'driver': None,
 }
 
 mainstack_special_pages = [ # page indexes where the next button should be locked
@@ -261,7 +262,9 @@ class Handler:
 			main_stack.get_visible_child()
 		)
 		if current_child_index in mainstack_interact_pages:
-			current_config['packages'] = driverMatcher.get_packages(current_config)
+			conf = driverMatcher.get_packages(current_config)
+			current_config['packages'] = conf['packages']
+			current_config['driver'] = conf['driver']
 			listboxHelper.empty_listbox(packages_to_install_listbox)
 			for p in current_config['packages']:
 				row = listboxHelper.make_row(p)
@@ -471,6 +474,13 @@ class Handler:
 			(current_config['packages'], install_thread_return_val)
 		)
 		wait_for_thread(t)
+
+		if current_config['driver'][current_config['distro']] in \
+		driverMatcher.post_install_actions:
+			driverMatcher.run_post_install_actions(
+				driverMatcher.post_install_actions[current_config['driver'][current_config['distro']]]
+			)
+
 		install_spinner.stop()
 
 	#	if sys.argv[1]:

@@ -3,6 +3,7 @@
 import platform
 import getpass
 from cardsList import *
+import os
 
 DISTROS = [
     'arch',
@@ -91,7 +92,14 @@ def get_packages(config_dict):
         ])
 
     c_dri=get_correct_drivers(hw_l, config_dict['distro'])
-    return drivers_dict[c_dri['driver']][c_dri['distro']]
+    return {
+        'packages': drivers_dict[c_dri['driver']][c_dri['distro']],
+        'driver': c_dri['driver']
+    }
+
+def run_post_install_actions(actions):
+    for i in actions:
+        os.system(i)
 
 drivers_dict={
     'nvidia': {
@@ -215,8 +223,8 @@ drivers_dict={
 post_install_actions = {
     'bumblebee': {
         'arch': [
-            'gpasswd -a '+USERNAME+' bumblebee',
-            'systemctl enable bumblebeed.service'
+            'if groups '+ USERNAME +' | grep &>/dev/null \"\\bbumblebee\\b\"; then true; else pkexec gpasswd -a '+ USERNAME +' bumblebee; fi',
+            'pkexec systemctl enable bumblebeed.service'
         ]
     }
 }
