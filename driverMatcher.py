@@ -215,7 +215,7 @@ drivers_dict={
             'libva-mesa-driver',
             'mesa-vdpau'
         ],
-    }
+    },
     #'amdgpupro': {
     #
     #}
